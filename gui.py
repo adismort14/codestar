@@ -1,6 +1,5 @@
 import streamlit as st
 import backend
-import os
 import deeplake
 
 from langchain.embeddings import HuggingFaceEmbeddings
@@ -20,7 +19,7 @@ docs = []
 allowed_extensions = [".py", ".ipynb", ".md", ".txt"]
 
 
-model_name = "mistralai/Mistral-7B-v0.1"
+# model_name = "mistralai/Mistral-7B-v0.1"
 # API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
 API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
 headers = {"Authorization": "Bearer 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"}
@@ -70,41 +69,20 @@ if user_repo:
 
     st.write("Done Loading. Ready to take your questions.")
 
-    # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat messages from history on app rerun
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     if query := st.chat_input("Type your question here."):
-        # # Add user message to chat history
         st.session_state.messages.append({"role": "user", "content": query})
-        # # Display user message in chat message container
         with st.chat_message("user"):
             st.markdown({query})
-        # # Display assistant response in chat message container
-        # print(prompt)
-        # query = "What type of packet does DNS use?"
         retrieved_docs = db.similarity_search(query)
         response = backend.queryFun(API_URL, headers, query, retrieved_docs)
         print(response)
-        # response = embedder.retrieve_results(prompt)
-        # Display assistant response in chat message container
         with st.chat_message("assistant"):
             st.markdown(response)
-        # # Add assistant response to chat history
         st.session_state.messages.append({"role": "assistant", "content": response})
-
-
-import requests
-
-API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
-headers = {"Authorization": "Bearer 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"}
-
-
-def query(payload):
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
