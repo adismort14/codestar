@@ -5,6 +5,7 @@ import deeplake
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import DeepLake
 
+print("Restarted")
 
 local = False
 if local:
@@ -13,41 +14,41 @@ if local:
     load_dotenv()
 
 clone_path = "cloned_repo/"
-print(clone_path)
 
 docs = []
 allowed_extensions = [".py", ".ipynb", ".md", ".txt"]
 
 
-# model_name = "mistralai/Mistral-7B-v0.1"
-# API_URL = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-v0.1"
 API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
 headers = {"Authorization": "Bearer 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"}
 
-deeplake_path = f"hub://adismort/{backend.processGitLink('https://github.com/adismort14/dns-resolver-socket-programming.git')}"
-
-# hf = HuggingFaceEmbeddings(model_name=model_name, cache_folder="C:\\Users\\ADITYA\\.cache\\torch\\sentence_transformers\\mistralai_Mistral-7B-v0.1")
-
 hf = HuggingFaceEmbeddings()
 
-st.title("SURDE-SURfe your coDE")
+st.set_page_config(
+    page_title="codestar.",
+    page_icon="🚀",
+    layout="wide",
+)
+
+st.title(
+    ":blue[CODESTAR] - :blue[CODE S]urfing :blue[T]ool for :blue[A]nswer :blue[R]etrieval"
+)
 
 user_repo = st.text_input(
-    "Enter Github Link to your public codebase",
+    r"$\textsf{\large Enter Github Link to your public codebase:}$",
+    placeholder="https://github.com/<USERNAME>/<REPO_NAME>.git",
 )
 
 if user_repo:
     st.write("You entered:", user_repo)
 
-    repoName = backend.processGitLink(
-        "https://github.com/adismort14/dns-resolver-socket-programming.git"
-    )
+    repoName = backend.processGitLink(user_repo)
 
     clone_path += repoName
 
-    backend.clone_repo(
-        "https://github.com/adismort14/dns-resolver-socket-programming.git", clone_path
-    )
+    backend.clone_repo(user_repo, clone_path)
+
+    deeplake_path = f"hub://adismort/{repoName}"
 
     st.write("Your repo has been cloned inside the working directory.")
 
@@ -80,7 +81,7 @@ if user_repo:
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
             st.markdown({query})
-        retrieved_docs = db.similarity_search(query)
+        retrieved_docs = db.similarity_search(query, k=5)
         response = backend.queryFun(API_URL, headers, query, retrieved_docs)
         print(response)
         with st.chat_message("assistant"):

@@ -1,6 +1,5 @@
 import git
 import os
-import deeplake
 import requests
 
 from langchain.document_loaders import TextLoader
@@ -11,7 +10,6 @@ from langchain.vectorstores import DeepLake
 def processGitLink(git_link) -> None:
     last_name = git_link.split("/")[-1]
     clone_path = last_name.split(".")[0]
-    print(clone_path)
     return clone_path
 
 
@@ -49,10 +47,18 @@ def embed_deeplake(texts, deeplake_path, hf):
 
 
 def queryFun(API_URL, headers, prompt, retrieved_docs):
+    retrieved_page_content = []
+    i = 1
+    for doc in retrieved_docs:
+        retrieved_page_content.append(
+            "Relevant Code Snippet " + str(i) + ": " + doc.page_content
+        )
+        i += 1
+
     payload = {
         "inputs": {
             "question": prompt,
-            "context": f" This is the relevant code snippet: {retrieved_docs}",
+            "context": f" This is the relevant code snippet: {retrieved_page_content}",
         }
     }
     print(payload)
