@@ -30,8 +30,19 @@ st.set_page_config(
     layout="wide",
 )
 
+st.markdown(
+    """
+<style>
+.big-font {
+    font-size:16px !important;
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
 st.title(
-    ":blue[CODESTAR] - :blue[CODE S]urfing :blue[T]ool for :blue[A]nswer :blue[R]etrieval"
+    ":blue[CODESTAR] - :blue[CODE S]urfing :blue[T]ool for :blue[A]nswer :blue[R]etrieval."
 )
 
 user_repo = st.text_input(
@@ -40,7 +51,10 @@ user_repo = st.text_input(
 )
 
 if user_repo:
-    st.write("You entered:", user_repo)
+    st.markdown(
+        f'<p class="big-font">You entered: {user_repo}</p>'.format(user_repo=user_repo),
+        unsafe_allow_html=True,
+    )
 
     repoName = backend.processGitLink(user_repo)
 
@@ -50,10 +64,14 @@ if user_repo:
 
     deeplake_path = f"hub://adismort/{repoName}"
 
-    st.write("Your repo has been cloned inside the working directory.")
+    st.markdown(
+        f'<p class="big-font">Your repo has been cloned inside the working directory.</p>',
+        unsafe_allow_html=True,
+    )
 
-    st.write(
-        "Parsing the content and embedding it. This may take some time. Please wait!"
+    st.markdown(
+        f'<p class="big-font">Parsing the content and embedding it. This may take some time. Please wait!</p>',
+        unsafe_allow_html=True,
     )
 
     exists = deeplake.exists(deeplake_path)
@@ -68,7 +86,10 @@ if user_repo:
         texts = backend.chunk_files(docs)
         db = backend.embed_deeplake(texts, deeplake_path, hf)
 
-    st.write("Done Loading. Ready to take your questions.")
+    st.markdown(
+        f'<p class="big-font">Done Loading. Ready to take your questions.</p>',
+        unsafe_allow_html=True,
+    )
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -80,10 +101,14 @@ if user_repo:
     if query := st.chat_input("Type your question here."):
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
-            st.markdown({query})
+            st.markdown(query)
         retrieved_docs = db.similarity_search(query, k=5)
-        response = backend.queryFun(API_URL, headers, query, retrieved_docs)
-        print(response)
+        response = backend.queryFun(
+            API_URL, headers, query, retrieved_docs, st.session_state.messages
+        )
+        print(type(response))
+        print(response.json())
+        # print(response.content)
         with st.chat_message("assistant"):
-            st.markdown(response)
+            st.markdown(response.json().answer)
         st.session_state.messages.append({"role": "assistant", "content": response})
