@@ -1,9 +1,11 @@
 import streamlit as st
 import backend
-import deeplake
 
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import DeepLake
+# import deeplake
+import kinda_final
+
+# from langchain.embeddings import HuggingFaceEmbeddings
+# from langchain.vectorstores import DeepLake
 
 print("Restarted")
 
@@ -19,10 +21,10 @@ docs = []
 allowed_extensions = [".py", ".ipynb", ".md", ".txt"]
 
 
-API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
-headers = {"Authorization": "Bearer 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"}
+# API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
+# headers = {"Authorization": "Bearer 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"}
 
-hf = HuggingFaceEmbeddings()
+# hf = HuggingFaceEmbeddings()
 
 st.set_page_config(
     page_title="codestar.",
@@ -62,7 +64,7 @@ if user_repo:
 
     backend.clone_repo(user_repo, clone_path)
 
-    deeplake_path = f"hub://adismort/{repoName}"
+    # deeplake_path = f"hub://adismort/{repoName}"
 
     st.markdown(
         f'<p class="big-font">Your repo has been cloned inside the working directory.</p>',
@@ -74,17 +76,22 @@ if user_repo:
         unsafe_allow_html=True,
     )
 
-    exists = deeplake.exists(deeplake_path)
-    if exists:
-        db = DeepLake(
-            dataset_path=deeplake_path,
-            read_only=True,
-            embedding_function=hf,
-        )
-    else:
-        backend.extract_all_files(clone_path, docs, allowed_extensions)
-        texts = backend.chunk_files(docs)
-        db = backend.embed_deeplake(texts, deeplake_path, hf)
+    # exists = deeplake.exists(deeplake_path)
+    # if exists:
+    #     db = DeepLake(
+    #         dataset_path=deeplake_path,
+    #         read_only=True,
+    #         embedding_function=hf,
+    #     )
+    # else:
+    #     backend.extract_all_files(clone_path, docs, allowed_extensions)
+    #     texts = backend.chunk_files(docs)
+    #     db = backend.embed_deeplake(texts, deeplake_path, hf)
+
+    docs = kinda_final.extract_all_files(clone_path, allowed_extensions)
+    texts = kinda_final.chunk_files(docs)
+    vectordb = kinda_final.create_vectordb(texts)
+    qa_chain = kinda_final.retriever_pipeline(vectordb)
 
     st.markdown(
         f'<p class="big-font">Done Loading. Ready to take your questions.</p>',
@@ -102,13 +109,24 @@ if user_repo:
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
             st.markdown(query)
-        retrieved_docs = db.similarity_search(query, k=5)
-        response = backend.queryFun(
-            API_URL, headers, query, retrieved_docs, st.session_state.messages
-        )
-        print(type(response))
-        print(response.json())
+        # retrieved_docs = db.similarity_search(query, k=5)
+        # response = backend.queryFun(
+        #     API_URL, headers, query, retrieved_docs, st.session_state.messages
+        # )
+        # response = backend.queryFunTrial(db, query)
+        # print(type(response))
+        # print(response)
         # print(response.content)
+
+        # query = "What are the strengths of candidate, Aditya?"
+        llm_response = qa_chain(query)
+        sources = ""
+        for source in llm_response["source_documents"]:
+            sources += source.metadata["source"] + "\n"
+        response = kinda_final.process_llm_response(llm_response)
+
         with st.chat_message("assistant"):
-            st.markdown(response.json().answer)
+            st.markdown(response)
+            st.markdown("Sources:")
+            st.markdown(sources)
         st.session_state.messages.append({"role": "assistant", "content": response})
