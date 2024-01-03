@@ -1,5 +1,4 @@
 import streamlit as st
-import backend
 import final
 
 print("Restarted")
@@ -58,11 +57,11 @@ if user_repo:
         unsafe_allow_html=True,
     )
 
-    repoName = backend.processGitLink(user_repo)
+    repoName = final.processGitLink(user_repo)
 
     clone_path += repoName
 
-    backend.clone_repo(user_repo, clone_path)
+    final.clone_repo(user_repo, clone_path)
 
     st.markdown(
         f'<p class="big-font">Your repo has been cloned inside the working directory.</p>',
