@@ -1,11 +1,6 @@
 import streamlit as st
 import backend
-
-# import deeplake
 import kinda_final
-
-# from langchain.embeddings import HuggingFaceEmbeddings
-# from langchain.vectorstores import DeepLake
 
 print("Restarted")
 
@@ -19,12 +14,6 @@ clone_path = "cloned_repo/"
 
 docs = []
 allowed_extensions = [".py", ".ipynb", ".md", ".txt"]
-
-
-# API_URL = "https://api-inference.huggingface.co/models/deepset/roberta-base-squad2"
-# headers = {"Authorization": "Bearer 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"}
-
-# hf = HuggingFaceEmbeddings()
 
 st.set_page_config(
     page_title="codestar.",
@@ -64,8 +53,6 @@ if user_repo:
 
     backend.clone_repo(user_repo, clone_path)
 
-    # deeplake_path = f"hub://adismort/{repoName}"
-
     st.markdown(
         f'<p class="big-font">Your repo has been cloned inside the working directory.</p>',
         unsafe_allow_html=True,
@@ -75,18 +62,6 @@ if user_repo:
         f'<p class="big-font">Parsing the content and embedding it. This may take some time. Please wait!</p>',
         unsafe_allow_html=True,
     )
-
-    # exists = deeplake.exists(deeplake_path)
-    # if exists:
-    #     db = DeepLake(
-    #         dataset_path=deeplake_path,
-    #         read_only=True,
-    #         embedding_function=hf,
-    #     )
-    # else:
-    #     backend.extract_all_files(clone_path, docs, allowed_extensions)
-    #     texts = backend.chunk_files(docs)
-    #     db = backend.embed_deeplake(texts, deeplake_path, hf)
 
     docs = kinda_final.extract_all_files(clone_path, allowed_extensions)
     texts = kinda_final.chunk_files(docs)
@@ -109,16 +84,6 @@ if user_repo:
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
             st.markdown(query)
-        # retrieved_docs = db.similarity_search(query, k=5)
-        # response = backend.queryFun(
-        #     API_URL, headers, query, retrieved_docs, st.session_state.messages
-        # )
-        # response = backend.queryFunTrial(db, query)
-        # print(type(response))
-        # print(response)
-        # print(response.content)
-
-        # query = "What are the strengths of candidate, Aditya?"
         llm_response = qa_chain(query)
         sources = ""
         for source in llm_response["source_documents"]:
