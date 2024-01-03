@@ -1,6 +1,5 @@
 langchain
 streamlit
-python-dotenv
+GitPython
 sentence_transformers
 transformers
-requests

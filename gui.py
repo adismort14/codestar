@@ -1,14 +1,6 @@
 import streamlit as st
 import final
 
-print("Restarted")
-
-local = False
-if local:
-    from dotenv import load_dotenv
-
-    load_dotenv()
-
 clone_path = "cloned_repo/"
 
 docs = []
