@@ -1,4 +1,4 @@
-# CODESTAR-CODE Interactive Code Exploration Tool
+# CODESTAR - CODE Surfing Tool for Answer Retrieval.
 
 CODESTAR is an innovative codebase chatbot designed to facilitate seamless interaction with your code. It caters to various user queries, whether related to code functionality, code explanation, or obtaining a high-level overview of the entire project. The tool harnesses the capabilities of the Mistral-7B Language Model (LLM) and employs a user-friendly chat interface created with Streamlit.
 
