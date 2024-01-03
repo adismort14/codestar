@@ -10,7 +10,7 @@ from langchain.document_loaders import TextLoader
 from langchain.llms import CTransformers
 from langchain.embeddings import HuggingFaceInstructEmbeddings
 
-config = {"max_new_tokens": 2048, "temperature": 0.1, "context_length": 2048}
+config = {"max_new_tokens": 1024, "temperature": 0.1, "context_length": 2048}
 llm = CTransformers(
     model="TheBloke/Mistral-7B-Instruct-v0.1-GGUF",
     model_file="mistral-7b-instruct-v0.1.Q4_K_M.gguf",

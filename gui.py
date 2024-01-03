@@ -13,7 +13,18 @@ if local:
 clone_path = "cloned_repo/"
 
 docs = []
-allowed_extensions = [".py", ".ipynb", ".md", ".txt"]
+allowed_extensions = [
+    ".py",
+    ".ipynb",
+    ".md",
+    ".txt",
+    ".c",
+    ".cpp",
+    ".js",
+    ".json",
+    ".html",
+    ".css",
+]
 
 st.set_page_config(
     page_title="codestar.",
@@ -84,14 +95,15 @@ if user_repo:
         st.session_state.messages.append({"role": "user", "content": query})
         with st.chat_message("user"):
             st.markdown(query)
-        llm_response = qa_chain(query)
-        sources = ""
-        for source in llm_response["source_documents"]:
-            sources += source.metadata["source"] + "\n"
+        llm_response = qa_chain(
+            query + "If you are not sure of the answer, simply state so."
+        )
+
         response = kinda_final.process_llm_response(llm_response)
 
         with st.chat_message("assistant"):
             st.markdown(response)
             st.markdown("Sources:")
-            st.markdown(sources)
+            for source in llm_response["source_documents"]:
+                st.markdown(source.metadata["source"])
         st.session_state.messages.append({"role": "assistant", "content": response})
