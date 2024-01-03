@@ -1,6 +1,6 @@
 import streamlit as st
 import backend
-import kinda_final
+import final
 
 print("Restarted")
 
@@ -74,10 +74,10 @@ if user_repo:
         unsafe_allow_html=True,
     )
 
-    docs = kinda_final.extract_all_files(clone_path, allowed_extensions)
-    texts = kinda_final.chunk_files(docs)
-    vectordb = kinda_final.create_vectordb(texts)
-    qa_chain = kinda_final.retriever_pipeline(vectordb)
+    docs = final.extract_all_files(clone_path, allowed_extensions)
+    texts = final.chunk_files(docs)
+    vectordb = final.create_vectordb(texts)
+    qa_chain = final.retriever_pipeline(vectordb)
 
     st.markdown(
         f'<p class="big-font">Done Loading. Ready to take your questions.</p>',
@@ -99,7 +99,7 @@ if user_repo:
             query + "If you are not sure of the answer, simply state so."
         )
 
-        response = kinda_final.process_llm_response(llm_response)
+        response = final.process_llm_response(llm_response)
 
         with st.chat_message("assistant"):
             st.markdown(response)
